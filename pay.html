@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Make Payment</title>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <h1>Pay Now</h1>
+    
+    <form id="payment-form">
+        <label for="amount">Enter Amount (in INR):</label>
+        <input type="number" id="amount" name="amount" min="100" required>
+        <label for="email">Email:</label>
+        <input type="email" name="email" id="email" required>
+        <button type="submit" id="pay-button">Proceed to Pay</button>
+    </form>
+
+    <form id="paymentForm" action="/success" method="POST" style="display: none;">
+        <input type="hidden" name="razorpay_payment_id" id="razorpay_payment_id">
+        <input type="hidden" name="razorpay_order_id" id="razorpay_order_id">
+        <input type="hidden" name="razorpay_signature" id="razorpay_signature">
+        <input type="hidden" name="order_id" id="order_id">
+        <input type="hidden" name="email" id="email_hidden">
+    </form>
+
+    <script>
+        document.getElementById('payment-form').onsubmit = function(e) {
+            e.preventDefault();
+            var amount = document.getElementById('amount').value * 100;  // Convert to paise
+            var email = document.getElementById('email').value;  // Get the email value
+            
+            // Create order on server
+            $.ajax({
+                url: '/create_order',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({amount: amount, email: email}),
+                success: function(response) {
+                    var options = {
+                        "key": "rzp_test_2xBwuSlxUQ23NX",  // Replace with your Razorpay key
+                        "amount": amount,
+                        "currency": "INR",
+                        "name": "Your Company Name",
+                        "description": "Test Transaction",
+                        "order_id": response.order_id,
+                        "handler": function (response) {
+                            document.getElementById('razorpay_payment_id').value = response.razorpay_payment_id;
+                            document.getElementById('razorpay_order_id').value = response.razorpay_order_id;
+                            document.getElementById('razorpay_signature').value = response.razorpay_signature;
+                            document.getElementById('order_id').value = response.order_id;
+                            document.getElementById('email_hidden').value = email;
+                            document.getElementById('paymentForm').submit();
+                        },
+                        "prefill": {
+                            "email": email
+                        },
+                        "theme": {
+                            "color": "#F37254"
+                        }
+                    };
+
+                    var rzp1 = new Razorpay(options);
+                    rzp1.open();
+                }
+            });
+        };
+    </script>
+</body>
+</html>

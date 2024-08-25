@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Payment Success</title>
+</head>
+<body>
+    <h1>Payment Successful!</h1>
+    <p>Thank you for your payment.</p>
+    
+    <h2>Payment Details:</h2>
+    <ul>
+        <li><strong>Order ID:</strong> {{ order_id }}</li>
+        <li><strong>Razorpay Payment ID:</strong> {{ razorpay_payment_id }}</li>
+        <li><strong>Razorpay Order ID:</strong> {{ razorpay_order_id }}</li>
+        <li><strong>Razorpay Signature:</strong> {{ razorpay_signature }}</li>
+    </ul>
+
+    
+    
+    <a href="{{ url_for('index') }}">Return to Home</a>
+</body>
+</html>
